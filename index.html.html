@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Inventory Barang</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px;
+      background-color: #f7f8fa;
+    }
+    h2 {
+      text-align: center;
+      color: #333;
+    }
+    form {
+      background: white;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+      width: 300px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    input, button {
+      padding: 8px;
+      margin-top: 5px;
+      width: 100%;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    th, td {
+      padding: 10px;
+      border: 1px solid #ddd;
+      text-align: center;
+    }
+    th {
+      background-color: #007bff;
+      color: white;
+    }
+    button {
+      cursor: pointer;
+      border: none;
+      background-color: #007bff;
+      color: white;
+      border-radius: 5px;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    #laporan {
+      margin-top: 30px;
+      padding: 15px;
+      background: #fff3cd;
+      color: #856404;
+      border: 1px solid #ffeeba;
+      border-radius: 10px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <h2>Inventory Barang</h2>
+
+  <form id="formBarang">
+    <label>Nama Barang:</label>
+    <input type="text" id="nama" required>
+    <label>Jumlah:</label>
+    <input type="number" id="jumlah" required>
+    <label>Harga:</label>
+    <input type="number" id="harga" required>
+    <button type="submit">Tambah Barang</button>
+  </form>
+
+  <table>
+    <thead>
+      <tr>
+        <th>No</th>
+        <th>Nama</th>
+        <th>Jumlah</th>
+        <th>Harga</th>
+        <th>Total</th>
+        <th>Aksi</th>
+      </tr>
+    </thead>
+    <tbody id="tabelBarang"></tbody>
+  </table>
+
+  <div id="laporan">
+    <h3>⚠️ Laporan Stok Hampir Habis</h3>
+    <ul id="daftarLaporan"></ul>
+  </div>
+
+  <script>
+    const form = document.getElementById('formBarang');
+    const tabelBody = document.getElementById('tabelBarang');
+    const laporanDiv = document.getElementById('laporan');
+    const daftarLaporan = document.getElementById('daftarLaporan');
+
+    let dataBarang = JSON.parse(localStorage.getItem("dataBarang")) || [];
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      let nama = document.getElementById('nama').value.trim();
+      let jumlah = parseInt(document.getElementById('jumlah').value);
+      let harga = parseInt(document.getElementById('harga').value);
+
+      if (nama && jumlah > 0 && harga > 0) {
+        dataBarang.push({ nama, jumlah, harga });
+        simpanData();
+        tampilkanBarang();
+        form.reset();
+      }
+    });
+
+    function simpanData() {
+      localStorage.setItem("dataBarang", JSON.stringify(dataBarang));
+    }
+
+    function tampilkanBarang() {
+      tabelBody.innerHTML = "";
+      dataBarang.forEach((barang, i) => {
+        let total = barang.jumlah * barang.harga;
+        let row = `
+          <tr>
+            <td>${i+1}</td>
+            <td>${barang.nama}</td>
+            <td>
+              <input type="number" value="${barang.jumlah}" min="1" style="width:60px" onchange="ubahStok(${i}, this.value)">
+              <button onclick="tambahStok(${i})">+</button>
+              <button onclick="kurangStok(${i})">-</button>
+            </td>
+            <td>Rp ${barang.harga.toLocaleString()}</td>
+            <td>Rp ${total.toLocaleString()}</td>
+            <td><button onclick="hapusBarang(${i})">Hapus</button></td>
+          </tr>
+        `;
+        tabelBody.innerHTML += row;
+      });
+      tampilkanLaporan();
+    }
+
+    function hapusBarang(i) {
+      dataBarang.splice(i, 1);
+      simpanData();
+      tampilkanBarang();
+    }
+
+    function tambahStok(i) {
+      dataBarang[i].jumlah++;
+      simpanData();
+      tampilkanBarang();
+    }
+
+    function kurangStok(i) {
+      if (dataBarang[i].jumlah > 1) {
+        dataBarang[i].jumlah--;
+        simpanData();
+        tampilkanBarang();
+      } else {
+        alert("Jumlah stok minimal 1");
+      }
+    }
+
+    function ubahStok(i, newValue) {
+      let val = parseInt(newValue);
+      if (val > 0) {
+        dataBarang[i].jumlah = val;
+        simpanData();
+        tampilkanBarang();
+      }
+    }
+
+    function tampilkanLaporan() {
+      let stokMenipis = dataBarang.filter(b => b.jumlah <= 5);
+      if (stokMenipis.length > 0) {
+        laporanDiv.style.display = "block";
+        daftarLaporan.innerHTML = stokMenipis.map(b => `<li>${b.nama} - sisa ${b.jumlah} stok</li>`).join("");
+      } else {
+        laporanDiv.style.display = "none";
+      }
+    }
+
+    // Tampilkan saat halaman pertama kali dibuka
+    tampilkanBarang();
+  </script>
+</body>
+</html>
