@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+https://msyaidhusen-dot.github.io/web-Inventory/<<<<<<< HEAD
 # web-inventory
 
 =======
