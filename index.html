@@ -1,193 +1,267 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <title>Inventory Barang</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sistem Inventori Barang</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      margin: 40px;
-      background-color: #f7f8fa;
+      background: #e8f9fd;
+      color: #333;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background: #00a8cc;
+      color: white;
+      padding: 15px 0;
+      text-align: center;
+      font-size: 20px;
+      font-weight: bold;
+    }
+    main {
+      width: 80%;
+      margin: 20px auto;
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
     }
     h2 {
-      text-align: center;
-      color: #333;
-    }
-    form {
-      background: white;
-      padding: 15px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      margin-bottom: 20px;
-      width: 300px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    input, button {
-      padding: 8px;
-      margin-top: 5px;
-      width: 100%;
+      color: #007b9e;
+      border-bottom: 2px solid #00a8cc;
+      padding-bottom: 5px;
     }
     table {
       width: 100%;
       border-collapse: collapse;
-      background: white;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      margin-top: 10px;
     }
     th, td {
-      padding: 10px;
-      border: 1px solid #ddd;
+      border: 1px solid #ccc;
       text-align: center;
+      padding: 8px;
     }
     th {
-      background-color: #007bff;
+      background: #00a8cc;
       color: white;
+    }
+    input, button {
+      padding: 8px;
+      margin: 5px;
+      border: 1px solid #aaa;
+      border-radius: 5px;
     }
     button {
       cursor: pointer;
-      border: none;
-      background-color: #007bff;
+      background: #00a8cc;
       color: white;
-      border-radius: 5px;
+      border: none;
     }
     button:hover {
-      background-color: #0056b3;
+      background: #007b9e;
     }
-    #laporan {
-      margin-top: 30px;
-      padding: 15px;
-      background: #fff3cd;
-      color: #856404;
-      border: 1px solid #ffeeba;
+    .actions button {
+      margin: 2px;
+    }
+    /* --- Tampilan Login --- */
+    #login-container {
+      width: 350px;
+      background: white;
       border-radius: 10px;
-      display: none;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      padding: 30px;
+      margin: 100px auto;
+      text-align: center;
+    }
+    #login-container input {
+      width: 90%;
+      margin: 8px 0;
+      padding: 10px;
+      border: 1px solid #aaa;
+      border-radius: 5px;
+    }
+    #login-container button {
+      width: 95%;
+      margin-top: 10px;
+      padding: 10px;
+    }
+    #error-msg {
+      color: red;
+      font-size: 14px;
     }
   </style>
 </head>
 <body>
-  <h2>Inventory Barang</h2>
 
-  <form id="formBarang">
-    <label>Nama Barang:</label>
-    <input type="text" id="nama" required>
-    <label>Jumlah:</label>
-    <input type="number" id="jumlah" required>
-    <label>Harga:</label>
-    <input type="number" id="harga" required>
-    <button type="submit">Tambah Barang</button>
-  </form>
+  <header>📦 Sistem Inventori Barang 📦</header>
 
-  <table>
-    <thead>
-      <tr>
-        <th>No</th>
-        <th>Nama</th>
-        <th>Jumlah</th>
-        <th>Harga</th>
-        <th>Total</th>
-        <th>Aksi</th>
-      </tr>
-    </thead>
-    <tbody id="tabelBarang"></tbody>
-  </table>
-
-  <div id="laporan">
-    <h3>⚠️ Laporan Stok Hampir Habis</h3>
-    <ul id="daftarLaporan"></ul>
+  <!-- Halaman Login -->
+  <div id="login-container">
+    <h2>Login Admin</h2>
+    <input type="text" id="username" placeholder="Username" />
+    <input type="password" id="password" placeholder="Password" />
+    <button onclick="login()">Masuk</button>
+    <p id="error-msg"></p>
   </div>
 
+  <!-- Halaman Inventori -->
+  <main id="inventori-container" style="display: none;">
+    <h2>Daftar Inventori Barang</h2>
+
+    <table id="tabel-barang">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nama</th>
+          <th>Jenis</th>
+          <th>Stok</th>
+          <th>Harga (Rp)</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <h2>Tambah / Update Barang</h2>
+    <div>
+      <input type="text" id="id" placeholder="ID Barang (A001)">
+      <input type="text" id="nama" placeholder="Nama Barang">
+      <input type="text" id="jenis" placeholder="Jenis Barang">
+      <input type="number" id="stok" placeholder="Stok">
+      <input type="number" id="harga" placeholder="Harga">
+      <button onclick="tambahAtauUpdateBarang()">Simpan</button>
+      <button onclick="logout()" style="background:#ff5252;">Logout</button>
+    </div>
+  </main>
+
   <script>
-    const form = document.getElementById('formBarang');
-    const tabelBody = document.getElementById('tabelBarang');
-    const laporanDiv = document.getElementById('laporan');
-    const daftarLaporan = document.getElementById('daftarLaporan');
+    // --- LOGIN ---
+    const USERNAME = "admin";
+    const PASSWORD = "iwan123";
 
-    let dataBarang = JSON.parse(localStorage.getItem("dataBarang")) || [];
+    function login() {
+      const user = document.getElementById("username").value.trim();
+      const pass = document.getElementById("password").value.trim();
+      const errorMsg = document.getElementById("error-msg");
 
-    form.addEventListener('submit', function(e) {
-      e.preventDefault();
-      let nama = document.getElementById('nama').value.trim();
-      let jumlah = parseInt(document.getElementById('jumlah').value);
-      let harga = parseInt(document.getElementById('harga').value);
-
-      if (nama && jumlah > 0 && harga > 0) {
-        dataBarang.push({ nama, jumlah, harga });
-        simpanData();
-        tampilkanBarang();
-        form.reset();
+      if (user === USERNAME && pass === PASSWORD) {
+        document.getElementById("login-container").style.display = "none";
+        document.getElementById("inventori-container").style.display = "block";
+      } else {
+        errorMsg.textContent = "Username atau password salah!";
       }
-    });
-
-    function simpanData() {
-      localStorage.setItem("dataBarang", JSON.stringify(dataBarang));
     }
 
-    function tampilkanBarang() {
-      tabelBody.innerHTML = "";
-      dataBarang.forEach((barang, i) => {
-        let total = barang.jumlah * barang.harga;
-        let row = `
-          <tr>
-            <td>${i+1}</td>
-            <td>${barang.nama}</td>
-            <td>
-              <input type="number" value="${barang.jumlah}" min="1" style="width:60px" onchange="ubahStok(${i}, this.value)">
-              <button onclick="tambahStok(${i})">+</button>
-              <button onclick="kurangStok(${i})">-</button>
-            </td>
-            <td>Rp ${barang.harga.toLocaleString()}</td>
-            <td>Rp ${total.toLocaleString()}</td>
-            <td><button onclick="hapusBarang(${i})">Hapus</button></td>
-          </tr>
+    function logout() {
+      if (confirm("Yakin ingin logout?")) {
+        document.getElementById("inventori-container").style.display = "none";
+        document.getElementById("login-container").style.display = "block";
+        document.getElementById("username").value = "";
+        document.getElementById("password").value = "";
+        document.getElementById("error-msg").textContent = "";
+      }
+    }
+
+    // --- Fungsi Local Storage ---
+    function simpanKeLocalStorage() {
+      localStorage.setItem("inventoriBarang", JSON.stringify(inventoriBarang));
+    }
+
+    function ambilDariLocalStorage() {
+      const data = localStorage.getItem("inventoriBarang");
+      return data ? JSON.parse(data) : null;
+    }
+
+    // --- DATA AWAL ---
+    let inventoriBarang = ambilDariLocalStorage() || [
+      { id: "A001", nama: "Kapas 8d 10x30", jenis: "Kapas", stok: 50, harga: 8000 },
+      { id: "A002", nama: "Kapas Ultra Hijau 10x30cm", jenis: "Kapas", stok: 100, harga: 2000 },
+      { id: "A003", nama: "Kapas Ultra Merah 10x30cm", jenis: "Kapas", stok: 100, harga: 2000 },
+      { id: "A004", nama: "Kapas Citra Merah 10x30cm", jenis: "Kapas", stok: 100, harga: 2000 },
+      { id: "A005", nama: "Kapas Citra Hijau 10x30cm", jenis: "Kapas", stok: 100, harga: 2000 },
+      { id: "A006", nama: "Kapas Ultra Hijau 1mx30cm", jenis: "Kapas", stok: 10, harga: 30000 },
+      { id: "A007", nama: "Kapas Citra Hijau 1mx30cm", jenis: "Kapas", stok: 10, harga: 30000 },
+    ];
+
+    // --- FUNGSI TAMPIL & CRUD ---
+    function tampilkanInventori() {
+      const tbody = document.querySelector("#tabel-barang tbody");
+      tbody.innerHTML = "";
+
+      inventoriBarang.forEach((barang) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${barang.id}</td>
+          <td>${barang.nama}</td>
+          <td>${barang.jenis}</td>
+          <td>${barang.stok}</td>
+          <td>${barang.harga.toLocaleString('id-ID')}</td>
+          <td class="actions">
+            <button onclick="editBarang('${barang.id}')">Edit</button>
+            <button onclick="hapusBarang('${barang.id}')">Hapus</button>
+          </td>
         `;
-        tabelBody.innerHTML += row;
+        tbody.appendChild(row);
       });
-      tampilkanLaporan();
     }
 
-    function hapusBarang(i) {
-      dataBarang.splice(i, 1);
-      simpanData();
-      tampilkanBarang();
-    }
+    function tambahAtauUpdateBarang() {
+      const id = document.getElementById("id").value.trim().toUpperCase();
+      const nama = document.getElementById("nama").value.trim();
+      const jenis = document.getElementById("jenis").value.trim();
+      const stok = parseInt(document.getElementById("stok").value);
+      const harga = parseInt(document.getElementById("harga").value);
 
-    function tambahStok(i) {
-      dataBarang[i].jumlah++;
-      simpanData();
-      tampilkanBarang();
-    }
+      if (!id || !nama || !jenis || isNaN(stok) || isNaN(harga)) {
+        alert("Mohon isi semua data dengan benar!");
+        return;
+      }
 
-    function kurangStok(i) {
-      if (dataBarang[i].jumlah > 1) {
-        dataBarang[i].jumlah--;
-        simpanData();
-        tampilkanBarang();
+      const index = inventoriBarang.findIndex((barang) => barang.id === id);
+
+      if (index !== -1) {
+        inventoriBarang[index] = { id, nama, jenis, stok, harga };
+        alert(`Data barang ${nama} berhasil diperbarui!`);
       } else {
-        alert("Jumlah stok minimal 1");
+        inventoriBarang.push({ id, nama, jenis, stok, harga });
+        alert(`Barang ${nama} berhasil ditambahkan!`);
+      }
+
+      simpanKeLocalStorage();
+      kosongkanForm();
+      tampilkanInventori();
+    }
+
+    function editBarang(id) {
+      const barang = inventoriBarang.find((b) => b.id === id);
+      if (barang) {
+        document.getElementById("id").value = barang.id;
+        document.getElementById("nama").value = barang.nama;
+        document.getElementById("jenis").value = barang.jenis;
+        document.getElementById("stok").value = barang.stok;
+        document.getElementById("harga").value = barang.harga;
       }
     }
 
-    function ubahStok(i, newValue) {
-      let val = parseInt(newValue);
-      if (val > 0) {
-        dataBarang[i].jumlah = val;
-        simpanData();
-        tampilkanBarang();
+    function hapusBarang(id) {
+      if (confirm("Yakin ingin menghapus barang ini?")) {
+        inventoriBarang = inventoriBarang.filter((b) => b.id !== id);
+        simpanKeLocalStorage();
+        tampilkanInventori();
       }
     }
 
-    function tampilkanLaporan() {
-      let stokMenipis = dataBarang.filter(b => b.jumlah <= 5);
-      if (stokMenipis.length > 0) {
-        laporanDiv.style.display = "block";
-        daftarLaporan.innerHTML = stokMenipis.map(b => `<li>${b.nama} - sisa ${b.jumlah} stok</li>`).join("");
-      } else {
-        laporanDiv.style.display = "none";
-      }
+    function kosongkanForm() {
+      document.getElementById("id").value = "";
+      document.getElementById("nama").value = "";
+      document.getElementById("jenis").value = "";
+      document.getElementById("stok").value = "";
+      document.getElementById("harga").value = "";
     }
 
-    // Tampilkan saat halaman pertama kali dibuka
-    tampilkanBarang();
+    tampilkanInventori();
   </script>
 </body>
 </html>
