@@ -17,11 +17,11 @@
       color: white;
       padding: 15px 0;
       text-align: center;
-      font-size: 20px;
+      font-size: 22px;
       font-weight: bold;
     }
     main {
-      width: 80%;
+      width: 85%;
       margin: 20px auto;
       background: white;
       border-radius: 10px;
@@ -47,7 +47,10 @@
       background: #00a8cc;
       color: white;
     }
-    input, button {
+    tr.low-stock {
+      background-color: #ffe0e0;
+    }
+    input, button, select {
       padding: 8px;
       margin: 5px;
       border: 1px solid #aaa;
@@ -58,6 +61,7 @@
       background: #00a8cc;
       color: white;
       border: none;
+      transition: 0.3s;
     }
     button:hover {
       background: #007b9e;
@@ -65,7 +69,6 @@
     .actions button {
       margin: 2px;
     }
-    /* --- Tampilan Login --- */
     #login-container {
       width: 350px;
       background: white;
@@ -91,17 +94,40 @@
       color: red;
       font-size: 14px;
     }
+    .filter-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+    .filter-container input {
+      width: 200px;
+    }
+    .show-password {
+      position: absolute;
+      right: 45px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: #007b9e;
+    }
+    #password-container {
+      position: relative;
+    }
   </style>
 </head>
 <body>
-
   <header>📦 Sistem Inventori Barang 📦</header>
 
   <!-- Halaman Login -->
   <div id="login-container">
     <h2>Login Admin</h2>
     <input type="text" id="username" placeholder="Username" />
-    <input type="password" id="password" placeholder="Password" />
+    <div id="password-container">
+      <input type="password" id="password" placeholder="Password" />
+      <span class="show-password" onclick="togglePassword()">👁️</span>
+    </div>
     <button onclick="login()">Masuk</button>
     <p id="error-msg"></p>
   </div>
@@ -109,6 +135,18 @@
   <!-- Halaman Inventori -->
   <main id="inventori-container" style="display: none;">
     <h2>Daftar Inventori Barang</h2>
+
+    <div class="filter-container">
+      <input type="text" id="search" placeholder="Cari barang..." onkeyup="tampilkanInventori()" />
+      <select id="sort-option" onchange="tampilkanInventori()">
+        <option value="">Urutkan...</option>
+        <option value="nama">Nama (A - Z)</option>
+        <option value="nama-desc">Nama (Z - A)</option>
+        <option value="harga">Harga (Termurah)</option>
+        <option value="harga-desc">Harga (Termahal)</option>
+      </select>
+      <button onclick="cetakLaporan()">🖨️ Cetak Laporan</button>
+    </div>
 
     <table id="tabel-barang">
       <thead>
@@ -118,6 +156,7 @@
           <th>Jenis</th>
           <th>Stok</th>
           <th>Harga (Rp)</th>
+          <th>Update Terakhir</th>
           <th>Aksi</th>
         </tr>
       </thead>
@@ -137,7 +176,6 @@
   </main>
 
   <script>
-    // --- LOGIN ---
     const USERNAME = "admin";
     const PASSWORD = "iwan123";
 
@@ -147,57 +185,78 @@
       const errorMsg = document.getElementById("error-msg");
 
       if (user === USERNAME && pass === PASSWORD) {
-        document.getElementById("login-container").style.display = "none";
-        document.getElementById("inventori-container").style.display = "block";
+        localStorage.setItem("isLoggedIn", "true");
+        tampilHalamanInventori();
       } else {
-        errorMsg.textContent = "Username atau password salah!";
+        errorMsg.textContent = "❌ Username atau password salah!";
       }
+    }
+
+    function togglePassword() {
+      const pass = document.getElementById("password");
+      pass.type = pass.type === "password" ? "text" : "password";
+    }
+
+    function tampilHalamanInventori() {
+      document.getElementById("login-container").style.display = "none";
+      document.getElementById("inventori-container").style.display = "block";
+      tampilkanInventori();
     }
 
     function logout() {
       if (confirm("Yakin ingin logout?")) {
+        localStorage.removeItem("isLoggedIn");
         document.getElementById("inventori-container").style.display = "none";
         document.getElementById("login-container").style.display = "block";
         document.getElementById("username").value = "";
         document.getElementById("password").value = "";
-        document.getElementById("error-msg").textContent = "";
       }
     }
 
-    // --- Fungsi Local Storage ---
     function simpanKeLocalStorage() {
       localStorage.setItem("inventoriBarang", JSON.stringify(inventoriBarang));
     }
 
     function ambilDariLocalStorage() {
       const data = localStorage.getItem("inventoriBarang");
-      return data ? JSON.parse(data) : null;
+      return data ? JSON.parse(data) : [];
     }
 
-    // --- DATA AWAL ---
-    let inventoriBarang = ambilDariLocalStorage() || [
-      { id: "A001", nama: "Kapas 8d 10x30", jenis: "Kapas", stok: 50, harga: 8000 },
-      { id: "A002", nama: "Kapas Ultra Hijau 10x30cm", jenis: "Kapas", stok: 100, harga: 2000 },
-      { id: "A003", nama: "Kapas Ultra Merah 10x30cm", jenis: "Kapas", stok: 100, harga: 2000 },
-      { id: "A004", nama: "Kapas Citra Merah 10x30cm", jenis: "Kapas", stok: 100, harga: 2000 },
-      { id: "A005", nama: "Kapas Citra Hijau 10x30cm", jenis: "Kapas", stok: 100, harga: 2000 },
-      { id: "A006", nama: "Kapas Ultra Hijau 1mx30cm", jenis: "Kapas", stok: 10, harga: 30000 },
-      { id: "A007", nama: "Kapas Citra Hijau 1mx30cm", jenis: "Kapas", stok: 10, harga: 30000 },
-    ];
+    let inventoriBarang = ambilDariLocalStorage();
 
-    // --- FUNGSI TAMPIL & CRUD ---
     function tampilkanInventori() {
       const tbody = document.querySelector("#tabel-barang tbody");
-      tbody.innerHTML = "";
+      const search = document.getElementById("search").value.toLowerCase();
+      const sort = document.getElementById("sort-option").value;
 
-      inventoriBarang.forEach((barang) => {
+      let dataTampil = inventoriBarang.filter(b => 
+        b.nama.toLowerCase().includes(search) ||
+        b.jenis.toLowerCase().includes(search) ||
+        b.id.toLowerCase().includes(search)
+      );
+
+      if (sort === "nama") dataTampil.sort((a, b) => a.nama.localeCompare(b.nama));
+      else if (sort === "nama-desc") dataTampil.sort((a, b) => b.nama.localeCompare(a.nama));
+      else if (sort === "harga") dataTampil.sort((a, b) => a.harga - b.harga);
+      else if (sort === "harga-desc") dataTampil.sort((a, b) => b.harga - a.harga);
+
+      tbody.innerHTML = "";
+      if (dataTampil.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7">Tidak ada data ditemukan.</td></tr>`;
+        return;
+      }
+
+      dataTampil.forEach((barang) => {
         const row = document.createElement("tr");
+        if (barang.stok <= 5) row.classList.add("low-stock");
+
         row.innerHTML = `
           <td>${barang.id}</td>
           <td>${barang.nama}</td>
           <td>${barang.jenis}</td>
           <td>${barang.stok}</td>
           <td>${barang.harga.toLocaleString('id-ID')}</td>
+          <td>${barang.updateTerakhir || "-"}</td>
           <td class="actions">
             <button onclick="editBarang('${barang.id}')">Edit</button>
             <button onclick="hapusBarang('${barang.id}')">Hapus</button>
@@ -205,6 +264,11 @@
         `;
         tbody.appendChild(row);
       });
+
+      const stokMenipis = inventoriBarang.filter(b => b.stok <= 5);
+      if (stokMenipis.length > 0) {
+        alert(`⚠️ Ada ${stokMenipis.length} barang dengan stok menipis (≤5). Segera lakukan restok!`);
+      }
     }
 
     function tambahAtauUpdateBarang() {
@@ -215,17 +279,20 @@
       const harga = parseInt(document.getElementById("harga").value);
 
       if (!id || !nama || !jenis || isNaN(stok) || isNaN(harga)) {
-        alert("Mohon isi semua data dengan benar!");
+        alert("⚠️ Mohon isi semua data dengan benar!");
         return;
       }
 
+      if (!confirm("Apakah Anda yakin ingin menyimpan data ini?")) return;
+
+      const tanggal = new Date().toLocaleString("id-ID");
       const index = inventoriBarang.findIndex((barang) => barang.id === id);
 
       if (index !== -1) {
-        inventoriBarang[index] = { id, nama, jenis, stok, harga };
-        alert(`Data barang ${nama} berhasil diperbarui!`);
+        inventoriBarang[index] = { id, nama, jenis, stok, harga, updateTerakhir: tanggal };
+        alert(`Barang ${nama} berhasil diperbarui!`);
       } else {
-        inventoriBarang.push({ id, nama, jenis, stok, harga });
+        inventoriBarang.push({ id, nama, jenis, stok, harga, updateTerakhir: tanggal });
         alert(`Barang ${nama} berhasil ditambahkan!`);
       }
 
@@ -246,7 +313,7 @@
     }
 
     function hapusBarang(id) {
-      if (confirm("Yakin ingin menghapus barang ini?")) {
+      if (confirm("Hapus barang ini?")) {
         inventoriBarang = inventoriBarang.filter((b) => b.id !== id);
         simpanKeLocalStorage();
         tampilkanInventori();
@@ -261,7 +328,47 @@
       document.getElementById("harga").value = "";
     }
 
-    tampilkanInventori();
+    function cetakLaporan() {
+      const data = inventoriBarang;
+      let html = `
+        <html>
+          <head><title>Laporan Inventori</title></head>
+          <body>
+            <h2 style="text-align:center;">Laporan Inventori Barang</h2>
+            <table border="1" cellspacing="0" cellpadding="6" style="width:100%;border-collapse:collapse;">
+              <tr>
+                <th>ID</th>
+                <th>Nama</th>
+                <th>Jenis</th>
+                <th>Stok</th>
+                <th>Harga (Rp)</th>
+                <th>Update Terakhir</th>
+              </tr>
+      `;
+
+      data.forEach(b => {
+        html += `
+          <tr>
+            <td>${b.id}</td>
+            <td>${b.nama}</td>
+            <td>${b.jenis}</td>
+            <td>${b.stok}</td>
+            <td>${b.harga.toLocaleString('id-ID')}</td>
+            <td>${b.updateTerakhir || '-'}</td>
+          </tr>
+        `;
+      });
+
+      html += `</table></body></html>`;
+
+      const win = window.open("", "_blank");
+      win.document.write(html);
+      win.document.close();
+      win.focus();
+      setTimeout(() => { win.print(); win.close(); }, 250);
+    }
+
+    if (localStorage.getItem("isLoggedIn") === "true") tampilHalamanInventori();
   </script>
 </body>
 </html>
