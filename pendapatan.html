@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Laporan Pendapatan</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    /* === Style CSS yang sama dicopy dari index.html === */
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: #e8f9fd;
+      color: #333;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background: #00a8cc;
+      color: white;
+      padding: 15px 10px;
+      text-align: center;
+      font-size: 20px;
+      font-weight: bold;
+    }
+    main {
+      width: 95%;
+      max-width: 1000px;
+      margin: 15px auto;
+      background: white;
+      border-radius: 10px;
+      padding: 15px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    }
+    h2 {
+      color: #007b9e;
+      border-bottom: 2px solid #00a8cc;
+      padding-bottom: 5px;
+      font-size: 18px;
+    }
+    input, button, select {
+      padding: 8px;
+      margin: 5px 0;
+      border: 1px solid #aaa;
+      border-radius: 5px;
+      font-size: 14px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    input[type="month"] {
+      padding: 5px;
+      background: #f4f4f4;
+    }
+    
+    /* === GAYA BARU UNTUK LINK AGAR TERLIHAT SEPERTI TOMBOL === */
+    a.button {
+        display: block;
+        padding: 8px;
+        margin: 5px 0;
+        border-radius: 5px;
+        font-size: 14px;
+        width: 100%;
+        box-sizing: border-box;
+        text-decoration: none;
+        text-align: center;
+        color: white;
+    }
+    .button-kembali { background: #777; }
+    .button-kembali:hover { background: #555; }
+    
+    .filter-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .filter-container input,
+    .filter-container select {
+      flex: 1 1 30%;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 13px;
+    }
+    th, td { border: 1px solid #ccc; text-align: center; padding: 8px; }
+    th { background: #00a8cc; color: white; }
+
+    #chart-container {
+        margin-top: 20px;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+    }
+    
+    /* === Media Query juga dicopy === */
+    @media (max-width: 768px) {
+      .filter-container { flex-direction: column; align-items: stretch; }
+      table, thead, tbody, th, td, tr { display: block; }
+      thead tr { display: none; }
+      tbody tr { margin-bottom: 12px; border: 1px solid #ddd; border-radius: 8px; background: #fdfdfd; padding: 10px; }
+      tbody td { text-align: right; padding-left: 50%; position: relative; border: none; border-bottom: 1px solid #eee; }
+      tbody td::before { content: attr(data-label); position: absolute; left: 10px; width: 45%; text-align: left; font-weight: bold; color: #007b9e; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>📦 Sistem Inventori & Pendapatan 📦</header>
+
+  <main id="pendapatan-container">
+    <h2>Laporan Pendapatan Bulanan</h2>
+    
+    <a href="index.html" class="button button-kembali" style="width:100%;">
+      ⬅️ Kembali ke Inventori
+    </a>
+    
+    <div class="filter-container" style="margin-top: 15px;">
+        <label for="filter-bulan" style="flex: 1 1 100%; font-size: 14px;">Pilih Bulan:</label>
+        <input type="month" id="filter-bulan" onchange="tampilkanPendapatan()">
+    </div>
+    
+    <h3 style="text-align: center;">Total Omset Bulan Ini: 
+        <span id="total-omset" style="color: #008c4a;">Rp 0</span>
+    </h3>
+
+    <div id="chart-container">
+        <canvas id="chart-pendapatan"></canvas>
+    </div>
+    
+    <h2>Detail Transaksi</h2>
+    <table id="tabel-penjualan">
+        <thead>
+            <tr>
+                <th>Tanggal</th>
+                <th>ID Barang</th>
+                <th>Nama</th>
+                <th>Jumlah</th>
+                <th>Harga Jual</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            </tbody>
+    </table>
+  </main>
+
+  <script>
+    // Variabel global untuk Chart
+    let chartPendapatanInstance = null;
+    
+    // Ambil data dari Local Storage
+    let riwayatPenjualan = ambilDariLocalStorage("riwayatPenjualan");
+    
+    // ======================
+    // FUNGSI LOCAL STORAGE
+    // ======================
+    function ambilDariLocalStorage(key) {
+      const data = localStorage.getItem(key);
+      return data ? JSON.parse(data) : [];
+    }
+    
+    // ======================
+    // FUNGSI CEK LOGIN
+    // ======================
+    // Fungsi ini PENTING untuk keamanan
+    // Ini akan mengusir pengguna jika mereka belum login
+    function checkLoginStatus() {
+        if (localStorage.getItem("isLoggedIn") !== "true") {
+            alert("Anda harus login terlebih dahulu!");
+            // Pindahkan paksa ke halaman login (index.html)
+            window.location.href = "index.html"; 
+        }
+    }
+
+    // ===================================
+    // FUNGSI HALAMAN PENDAPATAN
+    // ===================================
+
+    function tampilkanPendapatan() {
+        const filterBulan = document.getElementById("filter-bulan").value;
+        if (!filterBulan) return;
+        
+        const penjualanBulanIni = riwayatPenjualan.filter(p => p.tanggal.startsWith(filterBulan));
+        
+        const totalOmset = penjualanBulanIni.reduce((total, p) => total + p.total, 0);
+        document.getElementById("total-omset").textContent = `Rp ${totalOmset.toLocaleString("id-ID")}`;
+        
+        const tbody = document.querySelector("#tabel-penjualan tbody");
+        tbody.innerHTML = "";
+        
+        penjualanBulanIni.sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal));
+        
+        penjualanBulanIni.forEach(p => {
+            const row = document.createElement("tr");
+            const tgl = new Date(p.tanggal).toLocaleString("id-ID");
+            row.innerHTML = `
+                <td data-label="Tanggal">${tgl}</td>
+                <td data-label="ID Barang">${p.id}</td>
+                <td data-label="Nama">${p.nama}</td>
+                <td data-label="Jumlah">${p.jumlah}</td>
+                <td data-label="Harga Jual">${p.hargaJual.toLocaleString("id-ID")}</td>
+                <td data-label="Total">${p.total.toLocaleString("id-ID")}</td>
+            `;
+            tbody.appendChild(row);
+        });
+        
+        // Agregasi data untuk grafik
+        const omsetPerHari = {};
+        penjualanBulanIni.forEach(p => {
+            const hari = p.tanggal.split('T')[0];
+            omsetPerHari[hari] = (omsetPerHari[hari] || 0) + p.total;
+        });
+        
+        const labels = Object.keys(omsetPerHari).sort();
+        const data = labels.map(label => omsetPerHari[label]);
+        
+        renderGrafik(labels, data);
+    }
+    
+    function renderGrafik(labels, data) {
+        const ctx = document.getElementById('chart-pendapatan').getContext('2d');
+        
+        if (chartPendapatanInstance) {
+            chartPendapatanInstance.destroy();
+        }
+        
+        chartPendapatanInstance = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Omset Harian',
+                    data: data,
+                    backgroundColor: 'rgba(0, 168, 204, 0.6)',
+                    borderColor: 'rgba(0, 168, 204, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return 'Rp ' + value.toLocaleString("id-ID");
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) { label += ': '; }
+                                if (context.parsed.y !== null) {
+                                    label += 'Rp ' + context.parsed.y.toLocaleString("id-ID");
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+    
+    // ======================
+    // FUNGSI INISIASI (LOAD)
+    // ======================
+    
+    // Saat halaman pendapatan.html dimuat:
+    // 1. Cek dulu apakah sudah login
+    checkLoginStatus(); 
+    
+    // 2. Set filter bulan ke bulan ini
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    document.getElementById("filter-bulan").value = `${yyyy}-${mm}`;
+    
+    // 3. Tampilkan data pendapatan
+    tampilkanPendapatan();
+
+  </script>
+</body>
+</html>

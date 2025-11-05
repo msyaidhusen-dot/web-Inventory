@@ -39,21 +39,30 @@
       padding-bottom: 5px;
       font-size: 18px;
     }
+    
+    .form-container {
+      background: #fdfdfd;
+      border: 1px solid #eee;
+      border-radius: 8px;
+      padding: 15px;
+      margin-top: 10px;
+    }
+    .form-container button {
+        margin-top: 10px;
+    }
 
     /* === Elemen Form === */
     input, button, select {
       padding: 8px;
-      margin: 5px;
+      margin: 5px 0;
       border: 1px solid #aaa;
       border-radius: 5px;
       font-size: 14px;
       width: 100%;
       box-sizing: border-box;
     }
-    
-    /* BARU: Style untuk input file */
     input[type="file"] {
-      padding: 4px;
+      padding: 5px;
       background: #f4f4f4;
     }
 
@@ -65,11 +74,41 @@
       transition: 0.3s;
     }
     button:hover { background: #007b9e; }
+    
+    a.button {
+        display: block;
+        padding: 8px;
+        margin: 5px 0;
+        border-radius: 5px;
+        font-size: 14px;
+        width: 100%;
+        box-sizing: border-box;
+        text-decoration: none;
+        text-align: center;
+        color: white;
+    }
+    
+    .button-impor { background: #008c4a; }
+    .button-impor:hover { background: #006b39; }
+    
+    .button-pendapatan { background: #f0a500; }
+    .button-pendapatan:hover { background: #c28400; }
 
+    .button-logout { background: #ff5252; }
+    .button-logout:hover { background: #d42c2c; }
+
+    /* === [CSS BARU] Tombol Aksi di Tabel === */
     .actions button {
       margin: 2px 0;
       width: 100%;
     }
+    .button-jual { background-color: #4CAF50; } /* Hijau */
+    .button-jual:hover { background-color: #388E3C; }
+    .button-edit { background-color: #00a8cc; } /* Biru (default) */
+    .button-edit:hover { background-color: #007b9e; }
+    .button-hapus { background-color: #e64a19; } /* Merah */
+    .button-hapus:hover { background-color: #c33000; }
+    
 
     /* === Login === */
     #login-container {
@@ -82,42 +121,7 @@
       margin: 80px auto;
       text-align: center;
     }
-    #login-container input {
-      width: 100%;
-      padding: 10px;
-      margin: 10px 0;
-    }
-    #password-container {
-      position: relative;
-    }
-    .show-password {
-      position: absolute;
-      right: 10px;
-      top: 50%;
-      transform: translateY(-50%);
-      cursor: pointer;
-      color: #00a8cc;
-    }
-
-    #error-msg {
-      color: red;
-      font-size: 14px;
-    }
-
-    /* === Filter === */
-    .filter-container {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 10px;
-    }
-    .filter-container input,
-    .filter-container select {
-      flex: 1 1 45%;
-    }
-
+    
     /* === Tabel === */
     table {
       width: 100%;
@@ -125,75 +129,73 @@
       margin-top: 10px;
       font-size: 13px;
     }
+    th, td { border: 1px solid #ccc; text-align: center; padding: 8px; }
+    th { background: #00a8cc; color: white; }
+    tr.low-stock { background: #ffe0e0; font-weight: bold; }
 
-    th, td {
-      border: 1px solid #ccc;
-      text-align: center;
-      padding: 8px;
+    /* === Tombol Stok +/- === */
+    .stok-controls {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        white-space: nowrap; 
     }
-
-    th {
-      background: #00a8cc;
-      color: white;
+    .stok-value {
+        font-weight: bold;
+        min-width: 30px;
     }
-
-    tr.low-stock {
-      background: #ffe0e0;
+    .stok-btn {
+        width: 28px;
+        height: 28px;
+        font-size: 16px;
+        font-weight: bold;
+        padding: 0;
+        line-height: 28px;
+        border-radius: 50%;
+        flex-shrink: 0;
     }
+    .stok-btn.minus { background-color: #e64a19; }
+    .stok-btn.minus:hover { background-color: #c33000; }
+    .stok-btn.plus { background-color: #4CAF50; }
+    .stok-btn.plus:hover { background-color: #388E3C; }
 
     /* === Responsif untuk HP === */
     @media (max-width: 768px) {
       header { font-size: 18px; }
-
-      .filter-container {
-        flex-direction: column;
-        align-items: stretch;
-      }
-
-      table, thead, tbody, th, td, tr {
-        display: block;
-      }
-
-      thead tr {
-        display: none;
-      }
-
-      tbody tr {
-        margin-bottom: 12px;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        background: #fdfdfd;
-        padding: 10px;
-      }
-
-      tbody td {
-        text-align: right;
-        padding-left: 50%;
-        position: relative;
-        border: none;
-        border-bottom: 1px solid #eee;
-      }
-
-      tbody td::before {
-        content: attr(data-label);
-        position: absolute;
-        left: 10px;
-        width: 45%;
-        text-align: left;
-        font-weight: bold;
-        color: #007b9e;
-      }
-
+      .filter-container { flex-direction: column; align-items: stretch; }
+      table, thead, tbody, th, td, tr { display: block; }
+      thead tr { display: none; }
+      tbody tr { margin-bottom: 12px; border: 1px solid #ddd; border-radius: 8px; background: #fdfdfd; padding: 10px; }
+      tbody td { text-align: right; padding-left: 50%; position: relative; border: none; border-bottom: 1px solid #eee; }
+      tbody td::before { content: attr(data-label); position: absolute; left: 10px; width: 45%; text-align: left; font-weight: bold; color: #007b9e; }
+      
+      /* [PERUBAHAN CSS] Tombol aksi di mobile */
       .actions button {
-        width: 48%;
-        display: inline-block;
+        width: 100%; /* Jadi 100% agar rapi */
+        display: block; /* Menumpuk ke bawah */
+        margin-bottom: 5px; /* Jarak antar tombol */
+      }
+      
+      tbody td[data-label="Stok"] {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      tbody td[data-label="Stok"]::before {
+        position: relative;
+        left: 0;
+        width: auto;
+      }
+      .stok-controls {
+        justify-content: flex-end;
       }
     }
   </style>
 </head>
 <body>
 
-  <header>📦 Sistem Inventori Barang 📦</header>
+  <header>📦 Sistem Inventori & Pendapatan 📦</header>
 
   <div id="login-container">
     <h2>Login Admin</h2>
@@ -208,8 +210,12 @@
 
   <main id="inventori-container" style="display: none;">
     <h2>Daftar Inventori Barang</h2>
+    
+    <a href="pendapatan.html" class="button button-pendapatan" style="width:100%;">
+      📊 Lihat Laporan Pendapatan
+    </a>
 
-    <div class="filter-container">
+    <div class="filter-container" style="margin-top: 15px;">
       <input type="text" id="search" placeholder="Cari barang..." onkeyup="tampilkanInventori()">
       <select id="sort-option" onchange="tampilkanInventori()">
         <option value="">Urutkan...</option>
@@ -217,6 +223,7 @@
         <option value="nama-desc">Nama (Z - A)</option>
         <option value="harga">Harga (Termurah)</option>
         <option value="harga-desc">Harga (Termahal)</option>
+        <option value="stok">Stok (Tersedikit)</option>
       </select>
       <button onclick="cetakLaporan()">🖨️ Cetak Laporan</button>
     </div>
@@ -227,8 +234,7 @@
           <th>ID</th>
           <th>Nama</th>
           <th>Jenis</th>
-          <th>Stok</th>
-          <th>Harga</th>
+          <th>Koreksi Stok</th> <th>Harga</th>
           <th>Update</th>
           <th>Aksi</th>
         </tr>
@@ -236,31 +242,40 @@
       <tbody></tbody>
     </table>
 
-    <h2>Impor Data</h2>
-    <div>
-      <label for="file-import" style="font-size: 14px; margin: 5px; display: block;">Pilih file .CSV untuk diimpor:</label>
-      <input type="file" id="file-import" accept=".csv" onchange="imporData(event)" style="width: 100%;">
+    <div class="form-container">
+        <h2>Tambah / Update Barang</h2>
+        <p style="font-size: 13px; color: #555;">
+          Gunakan form ini untuk menambah barang baru atau mengedit data.
+          Untuk mencatat penjualan, gunakan tombol <strong>"Terjual"</strong> di tabel.
+        </p>
+        <input type="text" id="id" placeholder="ID Barang (A001)">
+        <input type="text" id="nama" placeholder="Nama Barang">
+        <input type="text" id="jenis" placeholder="Jenis Barang">
+        <input type="number" id="stok" placeholder="Stok">
+        <input type="number" id="harga" placeholder="Harga">
+        <button onclick="tambahAtauUpdateBarang()">Simpan</button>
     </div>
-    <h2>Tambah / Update Barang</h2>
-    <div>
-      <input type="text" id="id" placeholder="ID Barang (A001)">
-      <input type="text" id="nama" placeholder="Nama Barang">
-      <input type="text" id="jenis" placeholder="Jenis Barang">
-      <input type="number" id="stok" placeholder="Stok">
-      <input type="number" id="harga" placeholder="Harga">
-      <button onclick="tambahAtauUpdateBarang()">Simpan</button>
-      <button onclick="logout()" style="background:#ff5252;">Logout</button>
+
+    <div class="form-container">
+        <h2>Impor dari CSV</h2>
+        <input type="file" id="csv-file" accept=".csv">
+        <button onclick="imporCSV()" class="button-impor">Impor Data CSV</button>
     </div>
+
+    <button onclick="logout()" class="button-logout" style="width:100%; margin-top: 15px;">Logout</button>
   </main>
 
   <script>
     const USERNAME = "admin";
     const PASSWORD = "iwan123";
-
-    // Fungsi Cetak Laporan (opsional, agar tombol tidak error)
-    function cetakLaporan() {
-      window.print();
-    }
+    
+    // Data Inisialisasi
+    let inventoriBarang = ambilDariLocalStorage("inventoriBarang");
+    let riwayatPenjualan = ambilDariLocalStorage("riwayatPenjualan");
+    
+    // ======================
+    // FUNGSI NAVIGASI & LOGIN
+    // ======================
 
     function togglePassword() {
       const pass = document.getElementById("password");
@@ -274,9 +289,11 @@
 
       if (user === USERNAME && pass === PASSWORD) {
         localStorage.setItem("isLoggedIn", "true");
-        document.getElementById("login-container").style.display = "none";
-        document.getElementById("inventori-container").style.display = "block";
+        tampilkanHalamanInventori();
+        
         tampilkanInventori();
+        mintaIzinNotifikasi();
+        cekStokHabis();
       } else {
         errorMsg.textContent = "❌ Username atau password salah!";
       }
@@ -290,16 +307,27 @@
       }
     }
 
-    function simpanKeLocalStorage() {
-      localStorage.setItem("inventoriBarang", JSON.stringify(inventoriBarang));
+    function tampilkanHalamanInventori() {
+        document.getElementById("login-container").style.display = "none";
+        document.getElementById("inventori-container").style.display = "block";
     }
 
-    function ambilDariLocalStorage() {
-      const data = localStorage.getItem("inventoriBarang");
+    // ======================
+    // FUNGSI LOCAL STORAGE
+    // ======================
+    
+    function simpanKeLocalStorage(key, data) {
+      localStorage.setItem(key, JSON.stringify(data));
+    }
+
+    function ambilDariLocalStorage(key) {
+      const data = localStorage.getItem(key);
       return data ? JSON.parse(data) : [];
     }
 
-    let inventoriBarang = ambilDariLocalStorage();
+    // ======================
+    // FUNGSI INVENTORI
+    // ======================
 
     function tampilkanInventori() {
       const tbody = document.querySelector("#tabel-barang tbody");
@@ -312,38 +340,132 @@
         b.id.toLowerCase().includes(search)
       );
 
+      // (Logika sorting tidak berubah)
       if (sort === "nama") dataTampil.sort((a, b) => a.nama.localeCompare(b.nama));
       else if (sort === "nama-desc") dataTampil.sort((a, b) => b.nama.localeCompare(a.nama));
       else if (sort === "harga") dataTampil.sort((a, b) => a.harga - b.harga);
       else if (sort === "harga-desc") dataTampil.sort((a, b) => b.harga - a.harga);
+      else if (sort === "stok") dataTampil.sort((a, b) => a.stok - b.stok);
 
       tbody.innerHTML = "";
       dataTampil.forEach(b => {
         const row = document.createElement("tr");
         if (b.stok <= 5) row.classList.add("low-stock");
+        
+        // === [PERUBAHAN HTML DI SINI] ===
         row.innerHTML = `
           <td data-label="ID">${b.id}</td>
           <td data-label="Nama">${b.nama}</td>
           <td data-label="Jenis">${b.jenis}</td>
-          <td data-label="Stok">${b.stok}</td>
+          <td data-label="Koreksi Stok">
+            <div class="stok-controls">
+              <button class="stok-btn minus" onclick="ubahStok('${b.id}', -1)">-</button>
+              <span class="stok-value">${b.stok}</span>
+              <button class="stok-btn plus" onclick="ubahStok('${b.id}', 1)">+</button>
+            </div>
+          </td>
           <td data-label="Harga">${b.harga.toLocaleString("id-ID")}</td>
           <td data-label="Update">${b.updateTerakhir || "-"}</td>
-          <td data-label="Aksi">
-            <button onclick="editBarang('${b.id}')">Edit</button>
-            <button onclick="hapusBarang('${b.id}')">Hapus</button>
+          <td data-label="Aksi" class="actions">
+            <button class="button-jual" onclick="jualBarang('${b.id}')">🛒 Terjual</button>
+            <button class="button-edit" onclick="editBarang('${b.id}')">Edit</button>
+            <button class="button-hapus" onclick="hapusBarang('${b.id}')">Hapus</button>
           </td>`;
         tbody.appendChild(row);
       });
     }
 
+    // === [PERUBAHAN JAVASCRIPT: ubahStok] ===
+    // Fungsi ini sekarang HANYA mengubah stok, TIDAK mencatat penjualan
+    function ubahStok(id, jumlah) {
+        const index = inventoriBarang.findIndex(b => b.id === id);
+        if (index === -1) return;
+
+        const barang = inventoriBarang[index];
+        const stokBaru = barang.stok + jumlah;
+
+        if (stokBaru < 0) {
+            alert("Stok tidak boleh minus!");
+            return;
+        }
+        
+        // Update stok di array
+        barang.stok = stokBaru;
+        barang.updateTerakhir = new Date().toLocaleString("id-ID");
+
+        // === Logika Penjualan DIHAPUS DARI SINI ===
+
+        // Simpan & refresh UI
+        simpanKeLocalStorage("inventoriBarang", inventoriBarang);
+        tampilkanInventori();
+        cekStokHabis();
+    }
+    
+    // === [FUNGSI JAVASCRIPT BARU: jualBarang] ===
+    // Fungsi ini khusus untuk mencatat penjualan
+    function jualBarang(id) {
+        const index = inventoriBarang.findIndex(b => b.id === id);
+        if (index === -1) return;
+        
+        const barang = inventoriBarang[index];
+
+        const jumlahJualStr = prompt(`Berapa ${barang.nama} yang terjual?\nStok saat ini: ${barang.stok}`);
+        
+        // Jika user klik "Cancel"
+        if (jumlahJualStr === null) return; 
+        
+        const jumlahJual = parseInt(jumlahJualStr);
+
+        // Validasi input
+        if (isNaN(jumlahJual) || jumlahJual <= 0) {
+            alert("Jumlah tidak valid.");
+            return;
+        }
+        
+        if (jumlahJual > barang.stok) {
+            alert(`Stok tidak mencukupi! Stok ${barang.nama} hanya tersisa ${barang.stok}.`);
+            return;
+        }
+        
+        // ---- Proses Penjualan ----
+        
+        // 1. Kurangi stok
+        barang.stok = barang.stok - jumlahJual;
+        barang.updateTerakhir = new Date().toLocaleString("id-ID");
+        
+        // 2. Catat di riwayat penjualan
+        const totalPendapatan = jumlahJual * barang.harga;
+        const isoTanggal = new Date().toISOString();
+
+        riwayatPenjualan.push({
+            id: barang.id,
+            nama: barang.nama,
+            jumlah: jumlahJual,
+            hargaJual: barang.harga,
+            total: totalPendapatan,
+            tanggal: isoTanggal 
+        });
+        
+        // 3. Simpan kedua data
+        simpanKeLocalStorage("inventoriBarang", inventoriBarang);
+        simpanKeLocalStorage("riwayatPenjualan", riwayatPenjualan);
+        
+        // 4. Refresh UI
+        tampilkanInventori();
+        cekStokHabis();
+        alert(`Berhasil terjual ${jumlahJual} ${barang.nama}.`);
+    }
+
+    // === [PERUBAHAN JAVASCRIPT: tambahAtauUpdateBarang] ===
+    // Logika penjualan DIHAPUS dari fungsi ini
     function tambahAtauUpdateBarang() {
       const id = document.getElementById("id").value.trim().toUpperCase();
       const nama = document.getElementById("nama").value.trim();
       const jenis = document.getElementById("jenis").value.trim();
-      const stok = parseInt(document.getElementById("stok").value);
+      const stokBaru = parseInt(document.getElementById("stok").value);
       const harga = parseInt(document.getElementById("harga").value);
 
-      if (!id || !nama || !jenis || isNaN(stok) || isNaN(harga)) {
+      if (!id || !nama || !jenis || isNaN(stokBaru) || isNaN(harga)) {
         alert("⚠️ Mohon isi semua data dengan benar!");
         return;
       }
@@ -351,13 +473,19 @@
       const tanggal = new Date().toLocaleString("id-ID");
       const index = inventoriBarang.findIndex(b => b.id === id);
 
-      if (index !== -1) inventoriBarang[index] = { id, nama, jenis, stok, harga, updateTerakhir: tanggal };
-      else inventoriBarang.push({ id, nama, jenis, stok, harga, updateTerakhir: tanggal });
+      // === Logika Penjualan DIHAPUS DARI SINI ===
 
-      simpanKeLocalStorage();
+      // SIMPAN INVENTORI
+      if (index !== -1) {
+          inventoriBarang[index] = { id, nama, jenis, stok: stokBaru, harga, updateTerakhir: tanggal };
+      } else {
+          inventoriBarang.push({ id, nama, jenis, stok: stokBaru, harga, updateTerakhir: tanggal });
+      }
+
+      simpanKeLocalStorage("inventoriBarang", inventoriBarang);
       tampilkanInventori();
+      cekStokHabis();
       
-      // BARU: Bersihkan form setelah simpan
       document.getElementById("id").value = "";
       document.getElementById("nama").value = "";
       document.getElementById("jenis").value = "";
@@ -366,6 +494,7 @@
     }
 
     function editBarang(id) {
+      // (Fungsi tidak berubah)
       const b = inventoriBarang.find(b => b.id === id);
       if (!b) return;
       document.getElementById("id").value = b.id;
@@ -373,98 +502,90 @@
       document.getElementById("jenis").value = b.jenis;
       document.getElementById("stok").value = b.stok;
       document.getElementById("harga").value = b.harga;
+      window.scrollTo(0, document.body.scrollHeight);
     }
 
     function hapusBarang(id) {
-      if (confirm("Hapus barang ini?")) {
+      // (Fungsi tidak berubah)
+      if (confirm(`Yakin hapus barang dengan ID ${id}?`)) {
         inventoriBarang = inventoriBarang.filter(b => b.id !== id);
-        simpanKeLocalStorage();
+        simpanKeLocalStorage("inventoriBarang", inventoriBarang);
         tampilkanInventori();
+        cekStokHabis();
       }
     }
-
-    // --- BARU: Fungsi untuk Impor CSV ---
     
-    function imporData(event) {
-      const file = event.target.files[0];
-      if (!file) {
-        return;
-      }
-
+    function imporCSV() {
+      // (Fungsi tidak berubah)
+      const fileInput = document.getElementById('csv-file');
+      const file = fileInput.files[0];
+      if (!file) { alert("Pilih file CSV."); return; }
       const reader = new FileReader();
-      
-      reader.onload = function(e) {
-        const teks = e.target.result;
+      reader.onload = function(event) {
         try {
-          parseCSV(teks);
-          simpanKeLocalStorage();
+          const text = event.target.result;
+          const lines = text.split('\n').filter(line => line.trim() !== '');
+          if (lines.length <= 1) { alert("File CSV kosong."); return; }
+          let imporBerhasil = 0;
+          for (let i = 1; i < lines.length; i++) {
+            const values = lines[i].split(',');
+            if (values.length < 5) continue;
+            const [id, nama, jenis, stok, harga] = values.map(v => v.trim());
+            const stokInt = parseInt(stok);
+            const hargaInt = parseInt(harga);
+            if (!id || !nama || !jenis || isNaN(stokInt) || isNaN(hargaInt)) continue;
+            
+            const tanggal = new Date().toLocaleString("id-ID");
+            const index = inventoriBarang.findIndex(b => b.id === id.toUpperCase());
+            const dataBaru = { id: id.toUpperCase(), nama, jenis, stok: stokInt, harga: hargaInt, updateTerakhir: tanggal };
+
+            if (index !== -1) inventoriBarang[index] = dataBaru;
+            else inventoriBarang.push(dataBaru);
+            imporBerhasil++;
+          }
+          simpanKeLocalStorage("inventoriBarang", inventoriBarang);
           tampilkanInventori();
-          alert("✅ Data berhasil diimpor!");
-        } catch (error) {
-          alert("❌ Gagal mengimpor file. Pastikan format CSV sudah benar.");
-          console.error("Error parsing CSV:", error);
-        }
-        // Reset input file agar bisa impor file yang sama lagi
-        event.target.value = null; 
+          cekStokHabis();
+          alert(`Impor Selesai! Berhasil: ${imporBerhasil}`);
+        } catch (err) { alert("Gagal proses file."); }
       };
-
-      reader.onerror = function() {
-        alert("Gagal membaca file.");
-      };
-
       reader.readAsText(file);
     }
 
-    function parseCSV(teks) {
-      const baris = teks.split('\n');
-      const tanggal = new Date().toLocaleString("id-ID");
-      
-      // Mulai dari i = 1 untuk melewati baris header (ID,Nama,Jenis,Stok,Harga)
-      for (let i = 1; i < baris.length; i++) {
-        const barisData = baris[i].trim();
-        if (barisData === "") {
-          continue; // Lewati baris kosong
-        }
-        
-        // Pisahkan berdasarkan koma
-        const data = barisData.split(',');
-
-        if (data.length < 5) {
-          console.warn("Melewatkan baris yang tidak lengkap:", barisData);
-          continue; // Lewati baris yang datanya tidak lengkap
-        }
-
-        const barang = {
-          id: data[0].trim().toUpperCase(),
-          nama: data[1].trim(),
-          jenis: data[2].trim(),
-          stok: parseInt(data[3]),
-          harga: parseInt(data[4]),
-          updateTerakhir: tanggal
-        };
-
-        // Cek jika data valid
-        if (!barang.id || !barang.nama || isNaN(barang.stok) || isNaN(barang.harga)) {
-          console.warn("Melewatkan baris dengan data tidak valid:", barisData);
-          continue;
-        }
-
-        // Cek apakah barang sudah ada (untuk update) atau belum (untuk tambah)
-        const index = inventoriBarang.findIndex(b => b.id === barang.id);
-        if (index !== -1) {
-          inventoriBarang[index] = barang; // Update
-        } else {
-          inventoriBarang.push(barang); // Tambah baru
-        }
+    // ======================
+    // FUNGSI NOTIFIKASI
+    // ======================
+    function mintaIzinNotifikasi() {
+      // (Fungsi tidak berubah)
+      if ("Notification" in window && Notification.permission === "default") {
+        Notification.requestPermission();
       }
     }
-    // --- AKHIR BAGIAN BARU ---
 
-
-    if (localStorage.getItem("isLoggedIn") === "true")
-      document.getElementById("login-container").style.display = "none",
-      document.getElementById("inventori-container").style.display = "block",
+    function cekStokHabis() {
+      // (Fungsi tidak berubah)
+      const barangHabis = inventoriBarang.filter(b => b.stok <= 5);
+      if (barangHabis.length === 0) return;
+      const namaBarang = barangHabis.map(b => b.nama).join(', ');
+      if ("Notification" in window && Notification.permission === "granted") {
+        new Notification("⚠️ Stok Menipis!", {
+          body: `Segera restock: ${namaBarang}`,
+          tag: "stok-menipis"
+        });
+      }
+    }
+    
+    // ======================
+    // FUNGSI INISIASI (LOAD)
+    // ======================
+    
+    if (localStorage.getItem("isLoggedIn") === "true") {
+      // (Fungsi tidak berubah)
+      tampilkanHalamanInventori();
       tampilkanInventori();
+      mintaIzinNotifikasi();
+      cekStokHabis();
+    }
   </script>
 </body>
 </html>
